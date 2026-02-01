@@ -25,6 +25,12 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Simple Request Logging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // Health Check
 app.get('/health', (req, res) => res.json({ status: 'ok', message: 'Backend is reachable' }));
 

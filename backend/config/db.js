@@ -4,6 +4,8 @@ const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log('MongoDB Connected');
+        // Enable Mongoose debug mode to see database queries in the terminal
+        mongoose.set('debug', true);
     } catch (err) {
         console.error('MongoDB Connection Error:', err.message);
         process.exit(1);
