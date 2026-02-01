@@ -17,6 +17,10 @@ exports.signup = async (req, res) => {
         res.status(201).json({ token, user: { id: user._id, username, email } });
     } catch (err) {
         console.error('SIGNUP ERROR:', err);
+        // Special handling for duplicate key errors
+        if (err.code === 11000) {
+            return res.status(400).json({ message: 'Username or email already exists' });
+        }
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
