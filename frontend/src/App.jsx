@@ -141,6 +141,7 @@ function App() {
                 <CssBaseline />
                 <Router>
                     <Navbar />
+                    <IncomingCallOverlay />
                     <Routes>
                         <Route
                             path="/"
