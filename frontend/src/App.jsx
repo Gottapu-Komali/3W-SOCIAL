@@ -12,6 +12,7 @@ import Shorts from './pages/Shorts';
 
 import Notifications from './pages/Notifications';
 import Chat from './pages/Chat';
+import IncomingCallOverlay from './components/IncomingCallOverlay';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
