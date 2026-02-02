@@ -192,6 +192,20 @@ const Navbar = () => {
                                     </Typography>
                                 </Box>
 
+                                <Tooltip title="Logout">
+                                    <IconButton
+                                        onClick={handleLogout}
+                                        sx={{
+                                            ml: 1,
+                                            color: '#94A3B8',
+                                            '&:hover': { color: '#F43F5E', bgcolor: 'rgba(244, 63, 94, 0.1)' },
+                                            display: { xs: 'none', md: 'inline-flex' }
+                                        }}
+                                    >
+                                        <Logout fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={open}

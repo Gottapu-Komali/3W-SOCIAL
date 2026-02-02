@@ -88,7 +88,7 @@ const Profile = () => {
                                     <Typography variant="caption" sx={{ fontWeight: 600 }}>Joined {new Date(user.createdAt).toLocaleDateString()}</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', gap: 1.5, mt: 1.5 }}>
-                                    {currentUser?.username !== user.username && (
+                                    {currentUser?.username !== user.username ? (
                                         <Button
                                             variant="contained"
                                             startIcon={<ChatBubbleOutline />}
@@ -103,6 +103,28 @@ const Profile = () => {
                                             }}
                                         >
                                             Message
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => {
+                                                localStorage.removeItem('token');
+                                                localStorage.removeItem('user');
+                                                window.location.href = '/login';
+                                            }}
+                                            size="small"
+                                            sx={{
+                                                borderRadius: '100px',
+                                                px: 3,
+                                                borderColor: 'rgba(244, 63, 94, 0.5)',
+                                                color: '#F43F5E',
+                                                '&:hover': {
+                                                    borderColor: '#F43F5E',
+                                                    bgcolor: 'rgba(244, 63, 94, 0.05)'
+                                                }
+                                            }}
+                                        >
+                                            Logout
                                         </Button>
                                     )}
                                 </Box>
