@@ -36,15 +36,27 @@ exports.deleteNotification = async (req, res) => {
 
 exports.createCallNotification = async (req, res) => {
     try {
-        const { recipientId, type } = req.body;
-        const notification = new Notification({
+        const { recipientId } = req.body;
+
+        // 1. Create INCOMING notification for the receiver
+        const incomingNotif = new Notification({
             recipient: recipientId,
             sender: req.user.id,
-            type: type, // CALL_MISSED, CALL_INCOMING, CALL_OUTGOING
-            read: type === 'CALL_OUTGOING' // Outgoing calls are essentially read by the sender
+            type: 'CALL_INCOMING',
+            read: false
         });
-        await notification.save();
-        res.status(201).json(notification);
+
+        // 2. Create OUTGOING record for the caller (already read)
+        const outgoingNotif = new Notification({
+            recipient: req.user.id,
+            sender: recipientId,
+            type: 'CALL_OUTGOING',
+            read: true
+        });
+
+        await Promise.all([incomingNotif.save(), outgoingNotif.save()]);
+
+        res.status(201).json(outgoingNotif);
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }

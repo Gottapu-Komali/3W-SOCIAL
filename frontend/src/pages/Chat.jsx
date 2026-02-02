@@ -256,11 +256,22 @@ const Chat = () => {
     const startCall = async (type) => {
         setCallData({ active: true, type, status: 'dialing', duration: 0 });
 
-        // Log to history
+        // Trigger microhpone/camera permission to make it "feel" real
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: type === 'video'
+            });
+            // We stop the tracks immediately because this is a high-fidelity simulation
+            stream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+            console.warn('Media access denied or not available:', err);
+        }
+
+        // Log to history and notify recipient
         try {
             await API.post('/notifications/call', {
-                recipientId: selectedUser._id,
-                type: 'CALL_OUTGOING'
+                recipientId: selectedUser._id
             });
         } catch (err) {
             console.error('Failed to log call', err);
