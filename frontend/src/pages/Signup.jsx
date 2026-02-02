@@ -15,11 +15,20 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log('Sending signup request...', formData);
             const { data } = await API.post('/auth/signup', formData);
-            login(data.user, data.token);
-            navigate('/');
+            console.log('Signup Response Received:', data);
+
+            if (data.token && data.user) {
+                login(data.user, data.token);
+                console.log('Login context updated, navigating to home...');
+                navigate('/');
+            } else {
+                console.error('Data received but missing token/user:', data);
+                setError('Received invalid response from server');
+            }
         } catch (err) {
-            console.error('Signup Error:', err);
+            console.error('Signup Error Full Object:', err);
             const msg = err.response?.data?.message || err.message || 'Something went wrong';
             setError(msg);
         }
