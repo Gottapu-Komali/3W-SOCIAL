@@ -47,10 +47,16 @@ exports.login = async (req, res) => {
         email = email.trim().toLowerCase();
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!user) {
+            console.log(`Login attempt failed: User not found for email ${email}`);
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!isMatch) {
+            console.log(`Login attempt failed: Password mismatch for email ${email}`);
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
 
         if (!process.env.JWT_SECRET) {
             console.warn('⚠️ WARNING: JWT_SECRET is missing. Using fallback for demo. Set this in Render dashboard!');
