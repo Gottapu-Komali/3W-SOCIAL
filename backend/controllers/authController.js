@@ -22,7 +22,7 @@ exports.signup = async (req, res) => {
 
         if (!process.env.JWT_SECRET) {
             console.error('JWT_SECRET is missing in environment variables!');
-            return res.status(500).json({ message: 'Server configuration error' });
+            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET missing' });
         }
 
         const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
 
         if (!process.env.JWT_SECRET) {
             console.error('JWT_SECRET is missing in environment variables!');
-            return res.status(500).json({ message: 'Server configuration error' });
+            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET missing' });
         }
 
         const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });

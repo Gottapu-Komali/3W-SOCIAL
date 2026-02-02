@@ -12,6 +12,15 @@ dotenv.config();
 // Connect to Database
 connectDB();
 
+// Environment Variable Validation
+const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
+requiredEnv.forEach(env => {
+    if (!process.env[env]) {
+        console.error(`\x1b[31m[CRITICAL ERROR] ${env} is missing!\x1b[0m`);
+        console.error(`Make sure to set ${env} in your Render/Deployment environment variables.`);
+    }
+});
+
 const app = express();
 
 // Ensure uploads directory exists
