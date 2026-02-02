@@ -21,11 +21,11 @@ exports.signup = async (req, res) => {
         await user.save();
 
         if (!process.env.JWT_SECRET) {
-            console.error('JWT_SECRET is missing in environment variables!');
-            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET missing' });
+            console.warn('⚠️ WARNING: JWT_SECRET is missing. Using fallback for demo. Set this in Render dashboard!');
         }
 
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const secret = process.env.JWT_SECRET || '3w_social_fallback_secret_2024';
+        const token = jwt.sign({ id: user._id, username: user.username }, secret, { expiresIn: '7d' });
         res.status(201).json({ token, user: { id: user._id, username, email } });
     } catch (err) {
         console.error('SIGNUP ERROR:', err);
@@ -53,11 +53,11 @@ exports.login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
         if (!process.env.JWT_SECRET) {
-            console.error('JWT_SECRET is missing in environment variables!');
-            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET missing' });
+            console.warn('⚠️ WARNING: JWT_SECRET is missing. Using fallback for demo. Set this in Render dashboard!');
         }
 
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const secret = process.env.JWT_SECRET || '3w_social_fallback_secret_2024';
+        const token = jwt.sign({ id: user._id, username: user.username }, secret, { expiresIn: '7d' });
         res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
     } catch (err) {
         console.error('LOGIN ERROR:', err);

@@ -39,4 +39,4 @@ If I were to scale this to 10k+ users:
 4. **WebSockets**: Transition from polling to Socket.io for notifications and chat.
 
 ---
-**Developed with intent.** [ komal ]
+**Developed with intent.** [ komali ]
