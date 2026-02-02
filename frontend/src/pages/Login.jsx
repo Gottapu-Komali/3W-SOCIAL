@@ -15,11 +15,20 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log('Sending login request...', formData.email);
             const { data } = await API.post('/auth/login', formData);
-            login(data.user, data.token);
-            navigate('/');
+            console.log('Login Response Received:', data);
+
+            if (data.token && data.user) {
+                login(data.user, data.token);
+                console.log('Login context updated, navigating to home...');
+                navigate('/');
+            } else {
+                console.error('Login data received but missing token/user:', data);
+                setError('Invalid response from server');
+            }
         } catch (err) {
-            console.error('Login Error:', err);
+            console.error('Login Error Full Object:', err);
             const msg = err.response?.data?.message || err.message || 'Something went wrong';
             setError(msg);
         }
