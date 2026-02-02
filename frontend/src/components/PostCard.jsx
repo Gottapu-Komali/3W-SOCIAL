@@ -24,6 +24,9 @@ const PostCard = React.memo(({ post, onUpdate, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState({ title: post.title || '', text: post.text || '' });
     const [deleteConfirm, setDeleteConfirm] = useState(false);
+    const [shareDialogOpen, setShareDialogOpen] = useState(false);
+    const [friends, setFriends] = useState([]);
+    const [loadingFriends, setLoadingFriends] = useState(false);
     const lastTap = useRef(0);
 
     const isLiked = user && post.likes.includes(user.username);
@@ -85,6 +88,31 @@ const PostCard = React.memo(({ post, onUpdate, onDelete }) => {
         } catch (err) { console.error(err); }
     };
 
+    const fetchFriends = async () => {
+        setLoadingFriends(true);
+        try {
+            const { data } = await API.get('/users/friends');
+            setFriends(data);
+        } catch (err) {
+            console.error('Failed to fetch friends', err);
+        } finally {
+            setLoadingFriends(false);
+        }
+    };
+
+    const handleShareToFriend = async (friendId) => {
+        try {
+            await API.post('/messages', {
+                recipientId: friendId,
+                text: `Check out this story by @${post.username}: ${window.location.origin}/profile/${post.username}`
+            });
+            alert('Shared successfully!');
+            setShareDialogOpen(false);
+        } catch (err) {
+            console.error('Sharing failed', err);
+        }
+    };
+
     const CommentItem = ({ comment, isReply = false, parentId = null }) => {
         const cLiked = user && comment.likes.includes(user.username);
         return (
@@ -141,7 +169,16 @@ const PostCard = React.memo(({ post, onUpdate, onDelete }) => {
                             <MenuItem key="edit" onClick={() => { setIsEditing(true); setAnchorEl(null); }} sx={{ color: '#F8FAFC' }}><EditOutlined sx={{ mr: 1, fontSize: 20 }} /> Edit</MenuItem>,
                             <MenuItem key="delete" onClick={() => { setDeleteConfirm(true); setAnchorEl(null); }} sx={{ color: '#F43F5E' }}><DeleteOutline sx={{ mr: 1, fontSize: 20 }} /> Delete</MenuItem>
                         ]}
-                        <MenuItem sx={{ color: '#94A3B8' }}><ShareOutlined sx={{ mr: 1, fontSize: 20 }} /> Share</MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                setShareDialogOpen(true);
+                                setAnchorEl(null);
+                                fetchFriends();
+                            }}
+                            sx={{ color: '#94A3B8' }}
+                        >
+                            <ShareOutlined sx={{ mr: 1, fontSize: 20 }} /> Share
+                        </MenuItem>
                     </Menu>
                 </Box>
 
@@ -210,6 +247,51 @@ const PostCard = React.memo(({ post, onUpdate, onDelete }) => {
                     onCancel={() => setDeleteConfirm(false)}
                     confirmText="Delete Forever"
                 />
+
+                <Dialog
+                    open={shareDialogOpen}
+                    onClose={() => setShareDialogOpen(false)}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '24px',
+                            bgcolor: 'rgba(15, 23, 42, 0.95)',
+                            backdropFilter: 'blur(20px)',
+                            color: '#fff',
+                            minWidth: '320px',
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ fontWeight: 900, textAlign: 'center' }}>Send Story to</DialogTitle>
+                    <DialogContent>
+                        {loadingFriends ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><Skeleton variant="circular" width={40} height={40} /></Box>
+                        ) : (
+                            <List sx={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                {friends.length === 0 ? (
+                                    <Typography sx={{ textAlign: 'center', p: 2, color: '#94A3B8' }}>No friends connected yet</Typography>
+                                ) : (
+                                    friends.map((friend) => (
+                                        <MenuItem
+                                            key={friend._id}
+                                            onClick={() => handleShareToFriend(friend._id)}
+                                            sx={{ borderRadius: '12px', mb: 1, bgcolor: 'rgba(255,255,255,0.05)', p: 1.5 }}
+                                        >
+                                            <ListItemAvatar sx={{ minWidth: 48 }}>
+                                                <Avatar src={`${BASE_URL}/uploads/avatar-${friend._id}.png`} sx={{ width: 32, height: 32 }} />
+                                            </ListItemAvatar>
+                                            <ListItemText primary={friend.username} primaryTypographyProps={{ fontWeight: 700 }} />
+                                            <Send sx={{ color: 'primary.main', fontSize: 18, ml: 1 }} />
+                                        </MenuItem>
+                                    ))
+                                )}
+                            </List>
+                        )}
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2, justifyContent: 'center' }}>
+                        <Button onClick={() => setShareDialogOpen(false)} sx={{ color: '#64748B' }}>Cancel</Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         </motion.div>
     );
